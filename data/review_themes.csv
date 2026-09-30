@@ -1,0 +1,28 @@
+review_id,theme,polarity
+R01,Mains evaluation,positive
+R01,Consistency (targets / streaks / reminders),positive
+R01,Wants human-checked or timed tests,request
+R02,App stability (crashes),negative
+R02,iPad / device support,negative
+R03,Current Affairs features,request
+R03,AI output quality,negative
+R04,Consistency (targets / streaks / reminders),positive
+R04,Practice (MCQs / PYQs),positive
+R04,Mains evaluation,positive
+R05,Consistency (targets / streaks / reminders),positive
+R06,Habit-forming UX,positive
+R07,Consistency (targets / streaks / reminders),positive
+R08,Practice (MCQs / PYQs),positive
+R08,Progress tracking,positive
+R09,Consistency (targets / streaks / reminders),positive
+R09,Practice (MCQs / PYQs),positive
+R10,iPad / device support,request
+R11,Paid-user communication,negative
+R12,Practice (MCQs / PYQs),positive
+R12,Mains evaluation,positive
+R12,Consistency (targets / streaks / reminders),positive
+R12,App stability (crashes),negative
+R13,Consistency (targets / streaks / reminders),positive
+R13,Results not visibly improving,negative
+R13,Content gaps (optionals),request
+R14,Mains evaluation,positive

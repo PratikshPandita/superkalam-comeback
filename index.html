@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Comeback Mode – a product concept for SuperKalam</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Mukta:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #F6F8FB;
+    --card: #FFFFFF;
+    --rule: #D5DFEE;
+    --ink: #1D3F8F;
+    --ink-soft: #E4EAF6;
+    --margin: #D2544B;
+    --stamp: #2E7D4F;
+    --text: #1B2230;
+    --muted: #5B6577;
+    --sans: "Mukta", "Segoe UI", system-ui, -apple-system, sans-serif;
+    --hand: "Kalam", "Comic Sans MS", cursive;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  *, *::before, *::after { box-sizing: inherit; }
+  html { height: 100%; }
+  body {
+    margin: 0; min-height: 100%;
+    font-family: var(--sans); font-size: 16px; line-height: 1.5;
+    color: var(--text); background: #E9EEF6;
+  }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  :focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+
+  .page {
+    max-width: 1080px; margin: 0 auto; padding: 32px 20px 48px;
+    display: grid; gap: 32px; grid-template-columns: 1fr;
+  }
+  @media (min-width: 900px) {
+    .page { grid-template-columns: 400px 1fr; align-items: start; padding-top: 48px; }
+  }
+
+  /* ---------- Phone ---------- */
+  .phone {
+    background: var(--paper); border: 1px solid #C9D3E3; border-radius: 28px;
+    min-height: 760px; overflow: hidden; position: relative;
+    box-shadow: 0 20px 40px -24px rgba(29, 63, 143, 0.45);
+    display: flex; flex-direction: column;
+  }
+  @media (max-width: 520px) {
+    .page { padding: 0 0 32px; gap: 16px; }
+    .phone { border-radius: 0; border: 0; min-height: 100vh; box-shadow: none; }
+  }
+  .topbar {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 18px 22px 10px; border-bottom: 1px solid var(--rule);
+  }
+  .topbar strong { font-size: 18px; }
+  .topbar span { color: var(--muted); font-size: 14px; }
+  .screen { padding: 18px 22px 26px; flex: 1; display: flex; flex-direction: column; gap: 16px; }
+
+  h2 { font-size: 24px; line-height: 1.2; margin: 4px 0 0; font-weight: 700; }
+  p { margin: 0; }
+  .muted { color: var(--muted); }
+  .small { font-size: 14px; }
+
+  /* ---------- The study register (the memorable element) ---------- */
+  .register {
+    background:
+      linear-gradient(to right, transparent 26px, var(--margin) 26px, var(--margin) 27px, transparent 27px),
+      repeating-linear-gradient(to bottom, var(--card) 0, var(--card) 27px, var(--rule) 27px, var(--rule) 28px);
+    border: 1px solid var(--rule); border-radius: 6px; padding: 12px 12px 14px 36px;
+  }
+  .register-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+  .register-head b { font-size: 15px; }
+  .register-head .count { font-family: var(--hand); font-size: 22px; color: var(--ink); line-height: 1; }
+  .cells { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+  .cell {
+    aspect-ratio: 1; border: 1px solid var(--rule); border-radius: 4px; background: var(--card);
+    display: grid; place-items: center; position: relative; font-size: 11px; color: var(--muted);
+    padding-top: 8px;
+  }
+  .cell .d { position: absolute; top: 1px; left: 4px; font-size: 9px; line-height: 1; }
+  .stamp {
+    width: 62%; height: 62%; border-radius: 50%; border: 2px solid var(--ink);
+    display: grid; place-items: center; color: var(--ink);
+    font-family: var(--hand); font-weight: 700; font-size: 15px; line-height: 1; transform: rotate(-8deg);
+  }
+  .cell.faded .stamp { opacity: .22; }
+  .cell.today { border: 1.5px dashed var(--ink); }
+  .cell.missed .mark { font-family: var(--hand); font-size: 12px; color: var(--muted); transform: rotate(-6deg); }
+  .cell.kept .mark { font-family: var(--hand); font-size: 12px; color: var(--stamp); transform: rotate(-6deg); }
+  .cell.green .stamp { border-color: var(--stamp); color: var(--stamp); }
+  .cell.new .stamp { animation: stampIn .5s cubic-bezier(.2,.9,.3,1.2) both; }
+  @keyframes stampIn { from { transform: scale(1.8) rotate(-22deg); opacity: 0; } to { transform: scale(1) rotate(-8deg); opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .cell.new .stamp { animation: none; } }
+  .legend { margin-top: 8px; font-size: 12px; color: var(--muted); }
+
+  /* ---------- Controls ---------- */
+  .btn {
+    border: 0; border-radius: 12px; padding: 13px 16px; font-weight: 700; font-size: 16px; width: 100%;
+    background: var(--ink); color: #fff;
+  }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn.quiet { background: transparent; color: var(--ink); padding: 8px; font-weight: 500; }
+  .stack { display: flex; flex-direction: column; gap: 8px; margin-top: auto; }
+
+  .panel { background: var(--card); border: 1px solid var(--rule); border-radius: 12px; padding: 14px; }
+  .scale { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-top: 10px; }
+  .scale button, .chip {
+    border: 1px solid var(--rule); background: var(--card); border-radius: 10px; padding: 8px 6px; font-weight: 500;
+  }
+  .scale button[aria-pressed="true"], .chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .scale-ends { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { padding: 9px 12px; }
+  .choice { text-align: left; width: 100%; padding: 13px 14px; }
+
+  .plan { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .plan li { display: flex; justify-content: space-between; gap: 12px; padding: 10px 12px; background: var(--card); border: 1px solid var(--rule); border-radius: 10px; }
+  .plan li span:last-child { color: var(--muted); white-space: nowrap; }
+  .note { font-family: var(--hand); color: var(--ink); font-size: 17px; line-height: 1.35; }
+
+  .progress { height: 6px; background: var(--ink-soft); border-radius: 3px; overflow: hidden; }
+  .progress i { display: block; height: 100%; background: var(--ink); }
+  .opt { text-align: left; width: 100%; border: 1px solid var(--rule); background: var(--card); border-radius: 10px; padding: 12px 14px; }
+  .opt.right { border-color: var(--stamp); background: #E8F3EC; }
+  .opt.wrong { border-color: var(--margin); background: #FBECEA; }
+  .explain { border-left: 3px solid var(--ink); padding: 4px 0 4px 12px; font-size: 15px; }
+
+  textarea {
+    width: 100%; min-height: 200px; resize: vertical; font: 18px/28px var(--hand); color: var(--ink);
+    border: 1px solid var(--rule); border-radius: 6px; padding: 0 12px 0 36px;
+    background:
+      linear-gradient(to right, transparent 26px, var(--margin) 26px, var(--margin) 27px, transparent 27px),
+      repeating-linear-gradient(to bottom, var(--card) 0, var(--card) 27px, var(--rule) 27px, var(--rule) 28px);
+  }
+
+  /* ---------- Side panel ---------- */
+  .side h1 { font-size: 30px; line-height: 1.15; margin: 0 0 10px; }
+  .side > p { max-width: 62ch; }
+  .side section { margin-top: 28px; }
+  .side h3 { font-size: 17px; margin: 0 0 8px; }
+  .seg { display: inline-flex; border: 1px solid #B9C5DA; border-radius: 10px; overflow: hidden; background: var(--card); }
+  .seg button { border: 0; background: transparent; padding: 8px 14px; font-weight: 500; }
+  .seg button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+  .status { font-size: 14px; color: var(--muted); margin-top: 6px; }
+  .log {
+    background: #13244F; color: #DCE5F7; border-radius: 12px; padding: 12px 14px; height: 300px; overflow: auto;
+    font: 12.5px/1.55 ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  .log div { padding: 3px 0; border-bottom: 1px solid rgba(220, 229, 247, 0.08); }
+  .log .ev { color: #fff; font-weight: 700; }
+  .log .t { color: #8FA3CC; margin-right: 8px; }
+  .side a { color: var(--ink); }
+  .restart { margin-top: 12px; border: 1px solid #B9C5DA; background: var(--card); border-radius: 10px; padding: 8px 14px; font-weight: 500; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="phone" aria-label="App prototype">
+    <div class="topbar"><strong>Today</strong><span id="today-label"></span></div>
+    <main class="screen" id="screen" aria-live="polite"></main>
+  </div>
+
+  <aside class="side">
+    <h1>Comeback Mode</h1>
+    <p>A product concept for SuperKalam by Pratiksh Pandita. Consistency is what reviewers value most in SuperKalam, so this tests what happens on the day a streak breaks: a hard reset to zero, or a short, AI-built comeback that keeps the streak alive.</p>
+
+    <section>
+      <h3>Version you're seeing</h3>
+      <div class="seg" role="group" aria-label="Prototype version">
+        <button type="button" data-variant="comeback">Comeback Mode</button>
+        <button type="button" data-variant="reset">Current flow (reset)</button>
+      </div>
+      <p class="status">Testers get one version at random. Switching here restarts the flow and marks the run as a demo.</p>
+      <button type="button" class="restart" id="restart">Restart the flow</button>
+    </section>
+
+    <section>
+      <h3>Events sent to PostHog</h3>
+      <div class="log" id="log" aria-label="Analytics event log"></div>
+      <p class="status" id="ph-status"></p>
+    </section>
+
+    <section id="prd-section" hidden>
+      <h3>Read the full write-up</h3>
+      <p><a id="prd-link" href="#">Problem, evidence, solution and metrics (PRD)</a></p>
+    </section>
+  </aside>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/posthog-js@1.434.14/dist/array.full.js"></script>
+<script>
+/* ============ Configure before deploying ============ */
+const CONFIG = {
+  POSTHOG_KEY: '',                          // paste your PostHog project API key (starts with phc_)
+  POSTHOG_HOST: 'https://us.i.posthog.com', // use https://eu.i.posthog.com if your project is in the EU cloud
+  PRD_URL: ''                               // link to PRD.md on GitHub; shows in the side panel when set
+};
+/* ==================================================== */
+
+const STREAK_BEFORE = 12;
+const MISSED_TOPIC = 'Polity: Fundamental Rights';
+
+const MCQS = [
+  { q: 'Which Article of the Constitution abolishes untouchability?',
+    o: ['Article 14', 'Article 15', 'Article 17', 'Article 21'], a: 2,
+    e: 'Article 17 abolishes untouchability and forbids its practice in any form.' },
+  { q: 'The Right to Constitutional Remedies is provided under which Article?',
+    o: ['Article 19', 'Article 32', 'Article 226', 'Article 368'], a: 1,
+    e: 'Article 32 lets a person move the Supreme Court directly to enforce Fundamental Rights. Article 226 gives High Courts a wider writ power, but it is not itself a Fundamental Right.' },
+  { q: 'Which right was removed from the list of Fundamental Rights by the 44th Amendment Act, 1978?',
+    o: ['Right to freedom of religion', 'Right to property', 'Right against exploitation', 'Right to equality'], a: 1,
+    e: 'The right to property was taken out of Part III and made a constitutional (legal) right under Article 300A.' },
+  { q: 'Article 21A, the right to free and compulsory education, was inserted by which Amendment?',
+    o: ['42nd Amendment, 1976', '73rd Amendment, 1992', '86th Amendment, 2002', '93rd Amendment, 2005'], a: 2,
+    e: 'The 86th Amendment Act, 2002 inserted Article 21A for children aged 6 to 14.' },
+  { q: 'Which writ is issued to free a person who has been detained unlawfully?',
+    o: ['Mandamus', 'Habeas corpus', 'Certiorari', 'Quo warranto'], a: 1,
+    e: 'Habeas corpus orders the authority to produce the detained person before the court and justify the detention.' }
+];
+
+const REASONS = [
+  { id: 'work_college', label: 'Work or college ran late',
+    note: "Tomorrow's target moves to your evening slot. Pick a reminder time.", reminders: ['8 pm', '9 pm', '10 pm'],
+    done: t => `Tomorrow's target is in your evening slot${t ? `, with a reminder at ${t}` : ''}.` },
+  { id: 'unwell', label: 'I was unwell',
+    note: 'Tomorrow starts lighter: half your usual target.', reminders: null,
+    done: () => 'Tomorrow starts lighter: half your usual target.' },
+  { id: 'overwhelmed', label: 'The syllabus felt like too much',
+    note: "Tomorrow's target is halved, and it starts with a topic you already score well in.", reminders: null,
+    done: () => "Tomorrow's target is halved and starts with a topic you already score well in." },
+  { id: 'forgot', label: 'I just forgot',
+    note: 'Pick a time and we will remind you every day.', reminders: ['7 am', '1 pm', '9 pm'],
+    done: t => t ? `Daily reminder set for ${t}.` : 'You can set a daily reminder any time from your profile.' },
+  { id: 'other', label: 'Something else', note: 'Your usual plan continues tomorrow.', reminders: null,
+    done: () => 'Your usual plan continues tomorrow.' }
+];
+
+const PLAN_OPTIONS = {
+  10: { words: 0 },
+  15: { words: 150 },
+  20: { words: 250 }
+};
+
+/* ---------- Analytics ---------- */
+const logEl = document.getElementById('log');
+const phStatus = document.getElementById('ph-status');
+let phReady = false;
+if (CONFIG.POSTHOG_KEY && window.posthog) {
+  posthog.init(CONFIG.POSTHOG_KEY, { api_host: CONFIG.POSTHOG_HOST, person_profiles: 'always', autocapture: false });
+  phReady = true;
+  phStatus.textContent = 'Connected: events are being sent to PostHog.';
+} else {
+  phStatus.textContent = 'PostHog key not set: events show here only. Add your key in CONFIG to start collecting data.';
+}
+
+function track(event, props = {}) {
+  const payload = { variant: state.variant, variant_source: state.variantSource, run_id: state.runId, ...props };
+  if (phReady) posthog.capture(event, payload);
+  const row = document.createElement('div');
+  const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  const shown = Object.entries(props).map(([k, v]) => `${k}: ${v}`).join(', ');
+  row.innerHTML = `<span class="t">${time}</span><span class="ev"></span>${shown ? ' <span class="p"></span>' : ''}`;
+  row.querySelector('.ev').textContent = event;
+  if (shown) row.querySelector('.p').textContent = `{ ${shown} }`;
+  logEl.prepend(row);
+}
+
+/* ---------- Variant assignment ---------- */
+function storageGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+function storageSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+
+function assignVariant() {
+  const fromUrl = new URLSearchParams(location.search).get('variant');
+  if (fromUrl === 'comeback' || fromUrl === 'reset') return [fromUrl, 'url'];
+  const stored = storageGet('ck_variant');
+  if (stored === 'comeback' || stored === 'reset') return [stored, 'stored'];
+  const v = Math.random() < 0.5 ? 'comeback' : 'reset';
+  storageSet('ck_variant', v);
+  return [v, 'random'];
+}
+
+/* ---------- State ---------- */
+const state = {};
+function resetState(variant, source) {
+  Object.assign(state, {
+    variant, variantSource: source, runId: Math.random().toString(36).slice(2, 10),
+    step: 'missed', path: null, intentToday: null, reason: null, minutes: 15, reminder: null,
+    q: 0, answered: null, correct: 0, streakAfter: null, intentTomorrow: null, stampShown: false, mainsSubmitted: false
+  });
+  if (phReady) posthog.register({ variant, variant_source: source });
+  document.querySelectorAll('.seg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.variant === variant)));
+  track('test_started');
+  track('missed_day_viewed', { streak_before: STREAK_BEFORE });
+  render();
+}
+
+/* ---------- Helpers ---------- */
+const screen = document.getElementById('screen');
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const dayLabel = offset => {
+  const d = new Date(); d.setDate(d.getDate() + offset);
+  return d.getDate();
+};
+document.getElementById('today-label').textContent =
+  new Date().toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
+
+function registerHTML(mode) {
+  // mode: 'missed' | 'reset' | 'kept' | 'newstreak'
+  const cells = [];
+  for (let i = -13; i <= 0; i++) {
+    const d = `<span class="d">${dayLabel(i)}</span>`;
+    if (i < -1) {
+      const studied = i >= -1 - STREAK_BEFORE;
+      const faded = (mode === 'reset' || mode === 'newstreak') ? ' faded' : '';
+      cells.push(studied ? `<div class="cell${faded}">${d}<span class="stamp">✓</span></div>` : `<div class="cell">${d}</div>`);
+    } else if (i === -1) {
+      if (mode === 'kept') cells.push(`<div class="cell kept">${d}<span class="mark">kept</span></div>`);
+      else if (mode === 'missed') cells.push(`<div class="cell missed">${d}<span class="mark">paused</span></div>`);
+      else cells.push(`<div class="cell missed">${d}<span class="mark">missed</span></div>`);
+    } else {
+      if (mode === 'kept' || mode === 'newstreak') {
+        const anim = state.stampShown ? '' : ' new';
+        cells.push(`<div class="cell green${anim}">${d}<span class="stamp">✓</span></div>`);
+      }
+      else cells.push(`<div class="cell today">${d}</div>`);
+    }
+  }
+  const count = { missed: `${STREAK_BEFORE} days`, reset: '0 days', kept: `${STREAK_BEFORE + 1} days`, newstreak: '1 day' }[mode];
+  const legend = {
+    missed: 'Yesterday is paused, not crossed out. Today decides what happens next.',
+    reset: 'Missing a day resets the streak to zero.',
+    kept: 'Yesterday is marked as kept. It does not count as a study day, but your streak carries on.',
+    newstreak: 'A new streak starts today.'
+  }[mode];
+  return `<div class="register"><div class="register-head"><b>Your study register</b><span class="count">${count}</span></div>
+    <div class="cells">${cells.join('')}</div><p class="legend">${legend}</p></div>`;
+}
+
+function scaleHTML(name, value) {
+  return `<div class="scale" role="group" aria-label="${name}">${[1, 2, 3, 4, 5].map(n =>
+    `<button type="button" data-rate="${n}" aria-pressed="${value === n}">${n}</button>`).join('')}</div>
+    <div class="scale-ends"><span>Not likely</span><span>Definitely</span></div>`;
+}
+
+/* ---------- Screens ---------- */
+function render() {
+  const s = state;
+  let html = '';
+
+  if (s.step === 'missed') {
+    const comeback = s.variant === 'comeback';
+    html = `
+      ${registerHTML(comeback ? 'missed' : 'reset')}
+      <h2>You missed yesterday's target</h2>
+      <p>${comeback
+        ? `Your ${STREAK_BEFORE}-day streak is paused, not lost. Finish a short comeback today and it carries on.`
+        : 'Your streak has been reset. Start again today to build a new one.'}</p>
+      <div class="panel"><p class="small"><b>Quick question for this test:</b> how likely are you to study today?</p>${scaleHTML('Likelihood of studying today', s.intentToday)}</div>
+      <div class="stack">
+        ${comeback
+          ? `<button class="btn" id="go-comeback" ${s.intentToday ? '' : 'disabled'}>Start my comeback</button>
+             <button class="btn quiet" id="go-today" ${s.intentToday ? '' : 'disabled'}>Skip the comeback and start today's target</button>`
+          : `<button class="btn" id="go-today" ${s.intentToday ? '' : 'disabled'}>Start today's target</button>`}
+      </div>`;
+  }
+
+  if (s.step === 'reason') {
+    html = `
+      <h2>What got in the way yesterday?</h2>
+      <p class="muted">One tap. Your comeback plan and tomorrow's target adjust to your answer.</p>
+      <div class="stack" style="margin-top:0">${REASONS.map(r =>
+        `<button type="button" class="chip choice" data-reason="${r.id}">${esc(r.label)}</button>`).join('')}</div>`;
+  }
+
+  if (s.step === 'plan') {
+    const reason = REASONS.find(r => r.id === s.reason);
+    const words = PLAN_OPTIONS[s.minutes].words;
+    html = `
+      <h2>Your ${s.minutes}-minute comeback</h2>
+      <p class="muted">Built from yesterday's missed target: ${esc(MISSED_TOPIC)}.</p>
+      <div class="chips" role="group" aria-label="Comeback length">${Object.keys(PLAN_OPTIONS).map(m =>
+        `<button type="button" class="chip" data-min="${m}" aria-pressed="${String(Number(m) === s.minutes)}">${m} min</button>`).join('')}</div>
+      <ul class="plan">
+        <li><span>5 MCQs on ${esc(MISSED_TOPIC)}</span><span>~7 min</span></li>
+        ${words ? `<li><span>1 Mains answer, ${words} words</span><span>~${s.minutes - 7} min</span></li>` : ''}
+      </ul>
+      <p class="note">${esc(reason.note)}</p>
+      ${reason.reminders ? `<div class="chips" role="group" aria-label="Reminder time">${reason.reminders.map(t =>
+        `<button type="button" class="chip" data-rem="${t}" aria-pressed="${String(s.reminder === t)}">${t}</button>`).join('')}</div>` : ''}
+      <div class="stack"><button class="btn" id="start-plan">Start comeback</button></div>`;
+  }
+
+  if (s.step === 'mcq') {
+    const item = MCQS[s.q];
+    const done = s.answered !== null;
+    html = `
+      <div class="progress" aria-hidden="true"><i style="width:${(s.q / MCQS.length) * 100}%"></i></div>
+      <p class="small muted">Question ${s.q + 1} of ${MCQS.length} on ${esc(MISSED_TOPIC)}</p>
+      <h2 style="font-size:20px">${esc(item.q)}</h2>
+      <div class="stack" style="margin-top:0">${item.o.map((o, i) => {
+        let cls = 'opt';
+        if (done && i === item.a) cls += ' right';
+        else if (done && i === s.answered) cls += ' wrong';
+        return `<button type="button" class="${cls}" data-opt="${i}" ${done ? 'disabled' : ''}>${esc(o)}</button>`;
+      }).join('')}</div>
+      ${done ? `<p class="explain">${s.answered === item.a ? '<b>Correct.</b> ' : '<b>Not quite.</b> '}${esc(item.e)}</p>
+        <div class="stack"><button class="btn" id="next-q">${s.q === MCQS.length - 1 ? 'Finish questions' : 'Next question'}</button></div>` : ''}`;
+  }
+
+  if (s.step === 'mains') {
+    const words = PLAN_OPTIONS[s.minutes].words;
+    html = `
+      <h2>Write one short answer</h2>
+      <p>Discuss the importance of Article 32 in protecting Fundamental Rights. <span class="muted">(${words} words)</span></p>
+      <label class="sr" for="ans">Your answer</label>
+      <textarea id="ans" placeholder="Start writing here, or upload a photo of your handwritten answer in the full app."></textarea>
+      <p class="small muted" id="wc">0 of ${words} words</p>
+      <div class="stack">
+        <button class="btn" id="submit-ans">Submit for evaluation</button>
+        <button class="btn quiet" id="skip-ans">Skip the answer for today</button>
+      </div>`;
+  }
+
+  if (s.step === 'done') {
+    const kept = s.path === 'comeback';
+    const reason = REASONS.find(r => r.id === s.reason);
+    html = `
+      ${registerHTML(kept ? 'kept' : 'newstreak')}
+      <h2>${kept ? `Streak kept: ${s.streakAfter} days` : 'Day 1 of a new streak'}</h2>
+      <p>You got ${s.correct} of ${MCQS.length} right${kept && s.mainsSubmitted ? ' and your answer has gone for evaluation' : ''}.</p>
+      ${kept ? `<p class="note">${esc(reason.done(s.reminder))} Your next comeback unlocks in 7 days.</p>` : ''}
+      <div class="panel"><p class="small"><b>Last question for this test:</b> how likely are you to study tomorrow?</p>${scaleHTML('Likelihood of studying tomorrow', s.intentTomorrow)}</div>
+      ${s.intentTomorrow ? `<p class="small muted">Thanks, that's the whole test. Your answers help decide whether this should be built.</p>
+        <div class="stack"><button class="btn quiet" id="again">Run the test again</button></div>` : ''}`;
+  }
+
+  screen.innerHTML = html;
+  if (s.step === 'done') s.stampShown = true;
+  bind();
+}
+
+/* ---------- Interactions ---------- */
+function bind() {
+  const s = state;
+  const on = (sel, fn) => { const el = screen.querySelector(sel); if (el) el.addEventListener('click', fn); };
+
+  screen.querySelectorAll('[data-rate]').forEach(b => b.addEventListener('click', () => {
+    const n = Number(b.dataset.rate);
+    if (s.step === 'missed') { s.intentToday = n; track('intent_today_rated', { rating: n }); }
+    else { s.intentTomorrow = n; track('intent_tomorrow_rated', { rating: n }); }
+    render();
+  }));
+
+  on('#go-comeback', () => { s.path = 'comeback'; track('session_started', { path: 'comeback' }); s.step = 'reason'; render(); });
+  on('#go-today', () => { s.path = 'today_target'; track('session_started', { path: 'today_target' }); s.step = 'mcq'; render(); });
+
+  screen.querySelectorAll('[data-reason]').forEach(b => b.addEventListener('click', () => {
+    s.reason = b.dataset.reason; track('comeback_reason_selected', { reason: s.reason }); s.step = 'plan'; render();
+  }));
+  screen.querySelectorAll('[data-min]').forEach(b => b.addEventListener('click', () => { s.minutes = Number(b.dataset.min); render(); }));
+  screen.querySelectorAll('[data-rem]').forEach(b => b.addEventListener('click', () => { s.reminder = b.dataset.rem; render(); }));
+  on('#start-plan', () => {
+    track('comeback_plan_confirmed', { minutes: s.minutes, reminder_time: s.reminder || 'none' });
+    s.step = 'mcq'; render();
+  });
+
+  screen.querySelectorAll('[data-opt]').forEach(b => b.addEventListener('click', () => {
+    const i = Number(b.dataset.opt); const right = i === MCQS[s.q].a;
+    s.answered = i; if (right) s.correct++;
+    track('mcq_answered', { question: s.q + 1, correct: right });
+    render();
+  }));
+  on('#next-q', () => {
+    if (s.q < MCQS.length - 1) { s.q++; s.answered = null; render(); return; }
+    track('mcq_set_completed', { correct_count: s.correct });
+    if (s.path === 'comeback' && PLAN_OPTIONS[s.minutes].words) { s.step = 'mains'; render(); }
+    else finish();
+  });
+
+  const ans = screen.querySelector('#ans');
+  if (ans) ans.addEventListener('input', () => {
+    const n = ans.value.trim() ? ans.value.trim().split(/\s+/).length : 0;
+    screen.querySelector('#wc').textContent = `${n} of ${PLAN_OPTIONS[s.minutes].words} words`;
+  });
+  on('#submit-ans', () => {
+    const n = ans.value.trim() ? ans.value.trim().split(/\s+/).length : 0;
+    s.mainsSubmitted = true; track('mains_submitted', { word_count: n }); finish();
+  });
+  on('#skip-ans', () => { s.mainsSubmitted = false; track('mains_skipped'); finish(); });
+  on('#again', () => resetState(s.variant, s.variantSource));
+}
+
+function finish() {
+  const s = state;
+  s.streakAfter = s.path === 'comeback' ? STREAK_BEFORE + 1 : 1;
+  track('session_completed', { path: s.path, correct_count: s.correct, streak_after: s.streakAfter });
+  if (s.path === 'comeback') track('streak_restored', { streak_after: s.streakAfter });
+  s.step = 'done'; render();
+}
+
+/* ---------- Side panel ---------- */
+document.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => {
+  storageSet('ck_variant', b.dataset.variant);
+  resetState(b.dataset.variant, 'manual');
+}));
+document.getElementById('restart').addEventListener('click', () => resetState(state.variant, state.variantSource));
+if (CONFIG.PRD_URL) {
+  document.getElementById('prd-section').hidden = false;
+  document.getElementById('prd-link').href = CONFIG.PRD_URL;
+}
+
+const [v, src] = assignVariant();
+resetState(v, src);
+</script>
+</body>
+</html>
