@@ -2,7 +2,7 @@
 
 **Author:** Pratiksh Pandita  
 **Status:** Concept and working prototype, pending validation with aspirants  
-**Prototype:** _add your Vercel link_  
+**Prototype:** https://superkalam-comeback.vercel.app/  
 **Data and queries:** `/data` (review dataset and SQL), `/analytics` (PostHog queries)
 
 ## TL;DR
